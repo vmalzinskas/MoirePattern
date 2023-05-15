@@ -2,7 +2,6 @@ import cv2 as cv
 import numpy as np
 from icecream import ic
 import math
-from sklearn.cluster import MiniBatchKMeans
 import numpy as np
 
 
@@ -162,7 +161,7 @@ def process_all(sprite_sheet, frames, width, height):
 
 if __name__ == "__main__":
 
-    process_all(r"Images\iris1.png", 6, 4536, 756)
+    process_all(r"Images\iris3.png", 4, 4536, 756)
 
 
 
