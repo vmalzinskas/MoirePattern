@@ -59,32 +59,36 @@ class Moire:
 class Moire_animation:
 
 
-    def cut_frames(self, number_of_frames, mask_bands_width, cm, image_array):
+    def cut_frames(self, number_of_frames, mask_bands_width, cm, image):
         if cm:
             band_width = self.convert_cm_to_pxl(mask_bands_width)
         else:
             band_width = mask_bands_width
 
         break_width = band_width / (number_of_frames - 1)
-        for ii in range(len(image_array)):
-            ic(image)
-            rotated_image = cv.rotate(image, cv.ROTATE_90_CLOCKWISE)
+        # for ii in range(len(image_array)):
+        #     # ic(image)
+        #     image = image_array
+        rotated_image = cv.rotate(image, cv.ROTATE_90_CLOCKWISE)
 
-            for i in range(0, rotated_image.shape[0]-int(break_width + ii*break_width), int(band_width + break_width)):
-                rotated_image[i + int(ii*break_width): i + int(ii*break_width + band_width)] = [0, 0, 0, 0]
-            ic(r"Output\pattern" + str(ii) + "png")
-            cv.imwrite(r"Output\pattern_" + str(ii) + ".png", rotated_image)
-            ic(rotated_image)
-            cv.imshow("ss", rotated_image)
-            cv.waitKey(0)
-            cv.destroyAllWindows()
+        for i in range(0, rotated_image.shape[0]-int(break_width + break_width), int(band_width + break_width)):
+            rotated_image[i + int(break_width): i + int(break_width + band_width)] = [0, 0, 0, 0]
+        # ic(r"Output\pattern" + str(ii) + "png")
+        cv.imwrite(r"Output\pattern.png", rotated_image)
+
+        return rotated_image
+
+        # ic(rotated_image)
+        # cv.imshow("ss", rotated_image)
+        # cv.waitKey(0)
+        # cv.destroyAllWindows()
 
 
-    def overlay_images(self, array_images, width, height, frames):  # image.shape[0] = width, image.shape[1] = height
+    def overlay_images(self, image, width, height, frames):  # image.shape[0] = width, image.shape[1] = height
         overlayed_image = np.zeros([int(height), int(width/frames), 4], dtype=np.uint8)
         # ic(overlayed_image.shape)
         # self.show_image(overlayed_image)
-        image = array_images[0]
+     
         # ic(image.shape[0])
         # self.show_image(image)
         M = int(height)
@@ -129,28 +133,37 @@ class Moire_animation:
 
 
 
-if __name__ == "__main__":
+def process_all(sprite_sheet, frames, width, height):
+    mask = Moire(width=20, height=29, cm=True)
+    mask.genertate_mask(frames, 0.5, True)
+    # mask.show_mask()
+    mask.save_mask(fr"Output\A4_{frames}_frame_mask.png")
 
-    # mask = Moire(width=20, height=29, cm=True)
-    # mask.genertate_mask(4, 0.5, True)
-    # # mask.show_mask()
-    # mask.save_mask(r"Output\mask.png")
-
-    image = cv.imread(r"Images\blinkingIcon.png", cv.IMREAD_UNCHANGED)  # Sprite sheets work just like arrays it seems
+    image = cv.imread(sprite_sheet, cv.IMREAD_UNCHANGED)  # Sprite sheets work just like arrays it seems
     # ic(image)
-    img_arr = [image, image, image, image]
-    # cv.imshow("ss", img_arr[0])
+
+    # cv.imshow("ss", image)
     # cv.waitKey(0)
     # cv.destroyAllWindows()
     animation = Moire_animation()
-    animation.cut_frames(4, 0.5, True, img_arr)
+    rotated_image = animation.cut_frames(4, 0.5, True, image)
+    # cv.imshow("ss", rotated_image)
+    # cv.waitKey(0)
+    # cv.destroyAllWindows()
 
 
-    a = cv.imread(r"Output\pattern_0.png", cv.IMREAD_UNCHANGED)
-    b = cv.imread(r"Output\pattern_1.png", cv.IMREAD_UNCHANGED)
-    c = cv.imread(r"Output\pattern_2.png", cv.IMREAD_UNCHANGED)
-    d = cv.imread(r"Output\pattern_3.png", cv.IMREAD_UNCHANGED)
+    # a = cv.imread(r"Output\pattern_0.png", cv.IMREAD_UNCHANGED)
+    # b = cv.imread(r"Output\pattern_1.png", cv.IMREAD_UNCHANGED)
+    # c = cv.imread(r"Output\pattern_2.png", cv.IMREAD_UNCHANGED)
+    # d = cv.imread(r"Output\pattern_3.png", cv.IMREAD_UNCHANGED)
+    #
+    # arrays = [a, b, c, d]
+    animation.overlay_images(rotated_image, width, height, frames)
 
-    arrays = [a, b, c, d]
-    animation.overlay_images(arrays, 4536, 756, 6)
+if __name__ == "__main__":
+
+    process_all(r"Images\iris1.png", 6, 4536, 756)
+
+
+
 
