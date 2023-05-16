@@ -65,13 +65,20 @@ class Moire_animation:
             band_width = mask_bands_width
 
         break_width = band_width / (number_of_frames - 1)
+        # ic(band_width)
+        # ic(break_width)
+        # ic(image.shape[1]/number_of_frames)
         # for ii in range(len(image_array)):
         #     # ic(image)
         #     image = image_array
         rotated_image = cv.rotate(image, cv.ROTATE_90_CLOCKWISE)
-
-        for i in range(0, rotated_image.shape[0]-int(break_width + break_width), int(band_width + break_width)):
-            rotated_image[i + int(break_width): i + int(break_width + band_width)] = [0, 0, 0, 0]
+        # self.show_image((rotated_image))
+        for i in range(0, rotated_image.shape[0]-int(break_width + break_width - (number_of_frames * break_width)), int(band_width + break_width)):
+            # frame_offset = i // (image.shape[1]/number_of_frames)
+            ic(frame_offset)
+            rotated_image[i + int(break_width) + int(frame_offset * break_width): i + int(break_width + band_width) + int(frame_offset * break_width)] = [0, 0, 0, 0]
+            # ic(i + int(break_width) + (frame_offset * break_width))
+            # ic( i + int(break_width + band_width) + (frame_offset * break_width))
         # ic(r"Output\pattern" + str(ii) + "png")
         cv.imwrite(r"Output\pattern.png", rotated_image)
 
@@ -134,7 +141,7 @@ class Moire_animation:
 
 def process_all(sprite_sheet, frames, width, height):
     mask = Moire(width=20, height=29, cm=True)
-    mask.genertate_mask(frames, 0.5, True)
+    mask.genertate_mask(frames, 21, False)
     # mask.show_mask()
     mask.save_mask(fr"Output\A4_{frames}_frame_mask.png")
 
@@ -145,7 +152,7 @@ def process_all(sprite_sheet, frames, width, height):
     # cv.waitKey(0)
     # cv.destroyAllWindows()
     animation = Moire_animation()
-    rotated_image = animation.cut_frames(4, 0.5, True, image)
+    rotated_image = animation.cut_frames(4, 21, False, image)
     # cv.imshow("ss", rotated_image)
     # cv.waitKey(0)
     # cv.destroyAllWindows()
